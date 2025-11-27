@@ -17,8 +17,28 @@ class TypeUserFactory extends Factory
     public function definition(): array
     {
         return [
-            'wording' => fake()->unique()->randomElement(['Admin', 'Manager', 'Developer', 'Client', 'Guest', 'Moderator', 'Viewer', 'Editor']),
-            'is_active' => fake()->boolean(90),
+            'wording' => 'Client',
+            'is_active' => true,
         ];
+    }
+
+    /**
+     * Indicate that the type user is admin.
+     */
+    public function admin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'wording' => 'Admin',
+        ]);
+    }
+
+    /**
+     * Indicate that the type user is client.
+     */
+    public function client(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'wording' => 'Client',
+        ]);
     }
 }

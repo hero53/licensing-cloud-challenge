@@ -23,8 +23,13 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $clientType = \App\Models\TypeUser::firstOrCreate(
+            ['slug' => 'client'],
+            ['wording' => 'Client', 'is_active' => true]
+        );
+
         return [
-            'type_user_id' => \App\Models\TypeUser::factory(),
+            'type_user_id' => $clientType->id,
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
@@ -32,6 +37,43 @@ class UserFactory extends Factory
             'is_active' => fake()->boolean(85),
             'remember_token' => Str::random(10),
         ];
+    }
+
+    /**
+     * Indicate that the user is an admin.
+     */
+    public function admin(): static
+    {
+        return $this->state(function (array $attributes) {
+            $adminType = \App\Models\TypeUser::firstOrCreate(
+                ['slug' => 'admin'],
+                ['wording' => 'Admin', 'is_active' => true]
+            );
+
+            return [
+                'type_user_id' => $adminType->id,
+                'name' => 'Admin User',
+                'email' => 'admin@example.com',
+                'is_active' => true,
+            ];
+        });
+    }
+
+    /**
+     * Indicate that the user is a client.
+     */
+    public function client(): static
+    {
+        return $this->state(function (array $attributes) {
+            $clientType = \App\Models\TypeUser::firstOrCreate(
+                ['slug' => 'client'],
+                ['wording' => 'Client', 'is_active' => true]
+            );
+
+            return [
+                'type_user_id' => $clientType->id,
+            ];
+        });
     }
 
     /**

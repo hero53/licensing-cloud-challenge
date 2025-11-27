@@ -17,17 +17,18 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $typeUsers = TypeUser::factory(5)->create();
+        // Créer 1 utilisateur admin
+        $adminUser = User::factory()->admin()->create();
 
-        $users = User::factory(20)->create(function () use ($typeUsers) {
-            return [
-                'type_user_id' => $typeUsers->random()->id,
-            ];
-        });
+        // Créer 19 utilisateurs clients
+        $users = User::factory(19)->create();
 
-        $licences = Licence::factory(15)->create(function () use ($users) {
+        // Collecter tous les utilisateurs
+        $allUsers = collect([$adminUser])->merge($users);
+
+        $licences = Licence::factory(15)->create(function () use ($allUsers) {
             return [
-                'user_id' => $users->random()->id,
+                'user_id' => $allUsers->random()->id,
             ];
         });
 
@@ -43,10 +44,10 @@ class DatabaseSeeder extends Seeder
             ];
         });
 
-        JobExecution::factory(200)->create(function () use ($jobApplications, $users) {
+        JobExecution::factory(200)->create(function () use ($jobApplications, $allUsers) {
             return [
                 'job_application_id' => $jobApplications->random()->id,
-                'user_id' => $users->random()->id,
+                'user_id' => $allUsers->random()->id,
             ];
         });
     }
