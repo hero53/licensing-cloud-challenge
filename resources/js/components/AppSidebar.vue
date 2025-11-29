@@ -12,22 +12,33 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 import { BookOpen, Folder, LayoutGrid, Key } from 'lucide-vue-next';
+import { computed } from 'vue';
 import AppLogo from './AppLogo.vue';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: '/dashboard',
-        icon: LayoutGrid,
-    },
-    {
-        title: 'Licences',
-        href: '/licences',
-        icon: Key,
-    },
-];
+const page = usePage();
+const isAdmin = computed(() => page.props.auth?.isAdmin ?? false);
+
+const mainNavItems = computed<NavItem[]>(() => {
+    const items: NavItem[] = [
+        {
+            title: 'Dashboard',
+            href: '/dashboard',
+            icon: LayoutGrid,
+        },
+    ];
+
+    if (isAdmin.value) {
+        items.push({
+            title: 'Licences',
+            href: '/licences',
+            icon: Key,
+        });
+    }
+
+    return items;
+});
 
 const footerNavItems: NavItem[] = [
     {

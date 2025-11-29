@@ -2,7 +2,7 @@
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/vue3';
-import { Key, Calendar, Users, Plus, CheckCircle, XCircle } from 'lucide-vue-next';
+import { Key, Calendar, Users, Plus, CheckCircle, XCircle, Edit2, Power } from 'lucide-vue-next';
 import { ref } from 'vue';
 
 interface Licence {
@@ -43,7 +43,19 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const isModalOpen = ref(false);
+const isEditModalOpen = ref(false);
+const editingLicence = ref<Licence | null>(null);
+
 const form = ref({
+    wording: '',
+    description: '',
+    max_apps: 3,
+    max_executions_per_24h: 100,
+    valid_from: '',
+    valid_to: '',
+});
+
+const editForm = ref({
     wording: '',
     description: '',
     max_apps: 3,
@@ -97,10 +109,60 @@ const getStatusColor = (status: string) => {
             return 'text-green-600 bg-green-100 dark:bg-green-900/20';
         case 'EXPIRED':
             return 'text-red-600 bg-red-100 dark:bg-red-900/20';
+        case 'SUSPENDED':
+            return 'text-orange-600 bg-orange-100 dark:bg-orange-900/20';
         case 'PENDING':
             return 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/20';
         default:
             return 'text-gray-600 bg-gray-100 dark:bg-gray-900/20';
+    }
+};
+
+const openEditModal = (licence: Licence) => {
+    editingLicence.value = licence;
+    editForm.value = {
+        wording: licence.wording,
+        description: licence.description || '',
+        max_apps: licence.max_apps,
+        max_executions_per_24h: licence.max_executions_per_24h,
+        valid_from: licence.valid_from.split('T')[0],
+        valid_to: licence.valid_to.split('T')[0],
+    };
+    isEditModalOpen.value = true;
+};
+
+const closeEditModal = () => {
+    isEditModalOpen.value = false;
+    editingLicence.value = null;
+    editForm.value = {
+        wording: '',
+        description: '',
+        max_apps: 3,
+        max_executions_per_24h: 100,
+        valid_from: '',
+        valid_to: '',
+    };
+};
+
+const updateLicence = () => {
+    if (!editingLicence.value) return;
+
+    router.put(`/licences/${editingLicence.value.id}`, editForm.value, {
+        preserveScroll: true,
+        onSuccess: () => {
+            closeEditModal();
+        },
+    });
+};
+
+const toggleStatus = (licenceId: number, licenceName: string, currentStatus: string) => {
+    const newStatus = currentStatus === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE';
+    const action = newStatus === 'SUSPENDED' ? 'suspendre' : 'activer';
+
+    if (confirm(`Êtes-vous sûr de vouloir ${action} la licence "${licenceName}" ?`)) {
+        router.patch(`/licences/${licenceId}/toggle-status`, {}, {
+            preserveScroll: true,
+        });
     }
 };
 </script>
@@ -235,6 +297,31 @@ const getStatusColor = (status: string) => {
                                     <Calendar class="h-3.5 w-3.5 flex-shrink-0" />
                                     <span>Au {{ formatDate(licence.valid_to) }}</span>
                                 </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="flex gap-2 pt-2">
+                                <button
+                                    type="button"
+                                    @click="openEditModal(licence)"
+                                    class="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-all hover:bg-primary/90 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                                >
+                                    <Edit2 class="h-4 w-4" />
+                                    Modifier
+                                </button>
+                                <button
+                                    type="button"
+                                    @click="toggleStatus(licence.id, licence.wording, licence.status)"
+                                    :class="[
+                                        'inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm font-medium transition-all hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2',
+                                        licence.status === 'ACTIVE'
+                                            ? 'bg-orange-600 text-white hover:bg-orange-700 focus:ring-orange-500'
+                                            : 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500'
+                                    ]"
+                                    :title="licence.status === 'ACTIVE' ? 'Suspendre la licence' : 'Activer la licence'"
+                                >
+                                    <Power class="h-4 w-4" />
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -375,6 +462,131 @@ const getStatusColor = (status: string) => {
                         >
                             <Plus class="h-4 w-4" />
                             Créer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal pour éditer une licence -->
+        <div
+            v-if="isEditModalOpen"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+            @click.self="closeEditModal"
+        >
+            <div class="w-full max-w-md rounded-xl bg-card p-6 shadow-xl">
+                <div class="mb-4 flex items-center justify-between">
+                    <h3 class="text-xl font-semibold">Modifier la Licence</h3>
+                    <button
+                        @click="closeEditModal"
+                        class="rounded-lg p-1 hover:bg-muted"
+                    >
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <form @submit.prevent="updateLicence" class="space-y-4">
+                    <div>
+                        <label for="edit_wording" class="block text-sm font-medium mb-2">
+                            Nom de la licence <span class="text-red-500">*</span>
+                        </label>
+                        <input
+                            id="edit_wording"
+                            v-model="editForm.wording"
+                            type="text"
+                            required
+                            class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                            placeholder="Licence Premium"
+                        />
+                    </div>
+
+                    <div>
+                        <label for="edit_description" class="block text-sm font-medium mb-2">
+                            Description
+                        </label>
+                        <textarea
+                            id="edit_description"
+                            v-model="editForm.description"
+                            rows="2"
+                            class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                            placeholder="Description de la licence..."
+                        ></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="edit_max_apps" class="block text-sm font-medium mb-2">
+                                Max Applications <span class="text-red-500">*</span>
+                            </label>
+                            <input
+                                id="edit_max_apps"
+                                v-model.number="editForm.max_apps"
+                                type="number"
+                                min="1"
+                                required
+                                class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                            />
+                        </div>
+
+                        <div>
+                            <label for="edit_max_executions" class="block text-sm font-medium mb-2">
+                                Max Exec/24h <span class="text-red-500">*</span>
+                            </label>
+                            <input
+                                id="edit_max_executions"
+                                v-model.number="editForm.max_executions_per_24h"
+                                type="number"
+                                min="1"
+                                required
+                                class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="edit_valid_from" class="block text-sm font-medium mb-2">
+                                Date début <span class="text-red-500">*</span>
+                            </label>
+                            <input
+                                id="edit_valid_from"
+                                v-model="editForm.valid_from"
+                                type="date"
+                                required
+                                class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                            />
+                        </div>
+
+                        <div>
+                            <label for="edit_valid_to" class="block text-sm font-medium mb-2">
+                                Date fin <span class="text-red-500">*</span>
+                            </label>
+                            <input
+                                id="edit_valid_to"
+                                v-model="editForm.valid_to"
+                                type="date"
+                                required
+                                class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end gap-3 pt-4">
+                        <button
+                            type="button"
+                            @click="closeEditModal"
+                            class="rounded-lg border border-input px-4 py-2 text-sm font-medium hover:bg-muted"
+                        >
+                            Annuler
+                        </button>
+                        <button
+                            type="submit"
+                            class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                        >
+                            <Edit2 class="h-4 w-4" />
+                            Enregistrer
                         </button>
                     </div>
                 </form>

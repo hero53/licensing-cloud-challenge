@@ -11,6 +11,8 @@ class LicenceController extends Controller
 {
     public function index()
     {
+        $this->authorize('viewAny', Licence::class);
+
         $licences = Licence::withCount('users')
             ->orderBy('created_at', 'desc')
             ->get()
@@ -48,6 +50,8 @@ class LicenceController extends Controller
 
     public function store(Request $request)
     {
+        $this->authorize('create', Licence::class);
+
         $validated = $request->validate([
             'wording' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
@@ -69,5 +73,58 @@ class LicenceController extends Controller
         ]);
 
         return back()->with('success', 'Licence "' . $licence->wording . '" créée avec succès !');
+    }
+
+    public function update(Request $request, Licence $licence)
+    {
+        $this->authorize('update', $licence);
+
+        $validated = $request->validate([
+            'wording' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
+            'max_apps' => 'required|integer|min:1',
+            'max_executions_per_24h' => 'required|integer|min:1',
+            'valid_from' => 'required|date',
+            'valid_to' => 'required|date|after:valid_from',
+        ]);
+
+        $licence->update([
+            'wording' => $validated['wording'],
+            'description' => $validated['description'] ?? null,
+            'max_apps' => $validated['max_apps'],
+            'max_executions_per_24h' => $validated['max_executions_per_24h'],
+            'valid_from' => $validated['valid_from'],
+            'valid_to' => $validated['valid_to'],
+        ]);
+
+        return back()->with('success', 'Licence "' . $licence->wording . '" modifiée avec succès !');
+    }
+
+    public function toggleStatus(Licence $licence)
+    {
+        $this->authorize('update', $licence);
+
+        // Basculer le statut entre ACTIVE et SUSPENDED
+        $newStatus = $licence->status === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE';
+        $licence->update([
+            'status' => $newStatus,
+        ]);
+
+        $statusMessage = $newStatus === 'ACTIVE' ? 'activée' : 'suspendue';
+        return back()->with('success', 'Licence "' . $licence->wording . '" ' . $statusMessage . ' avec succès !');
+    }
+
+    public function destroy(Licence $licence)
+    {
+        $this->authorize('delete', $licence);
+
+        // Basculer le statut is_active
+        $newStatus = !$licence->is_active;
+        $licence->update([
+            'is_active' => $newStatus,
+        ]);
+
+        $statusMessage = $newStatus ? 'activée' : 'désactivée';
+        return back()->with('success', 'Licence "' . $licence->wording . '" ' . $statusMessage . ' avec succès !');
     }
 }

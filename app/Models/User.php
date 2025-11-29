@@ -97,4 +97,16 @@ class User extends Authenticatable
             ->withPivot('job_application_id')
             ->withTimestamps();
     }
+
+    /**
+     * Check if the user is an administrator.
+     */
+    public function isAdmin(): bool
+    {
+        if (!$this->typeUser) {
+            return false;
+        }
+
+        return $this->typeUser->slug === 'admin';
+    }
 }

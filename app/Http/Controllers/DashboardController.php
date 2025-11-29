@@ -247,4 +247,22 @@ class DashboardController extends Controller
             return back()->with('success', 'Votre licence a été upgradée vers "' . $newLicence->wording . '" avec succès !');
         }
     }
+
+    public function deleteApplication(Application $application)
+    {
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+
+        // Vérifier que l'application appartient à l'utilisateur
+        if ($application->user_id !== $user->id) {
+            return back()->with('error', 'Vous n\'êtes pas autorisé à supprimer cette application.');
+        }
+
+        // Suppression logique : mettre is_active à false
+        $application->update([
+            'is_active' => false,
+        ]);
+
+        return back()->with('success', 'L\'application "' . $application->wording . '" a été désactivée avec succès.');
+    }
 }

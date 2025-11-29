@@ -2,7 +2,7 @@
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/vue3';
-import { Key, Activity, Zap, Rocket, User, Plus, AlertTriangle, TrendingUp } from 'lucide-vue-next';
+import { Key, Activity, Zap, Rocket, User, Plus, AlertTriangle, TrendingUp, Trash2 } from 'lucide-vue-next';
 import { ref, computed } from 'vue';
 
 interface DashboardStats {
@@ -170,6 +170,14 @@ const executeJob = (applicationId: number) => {
         },
     });
 };
+
+const deleteApplication = (applicationId: number, applicationName: string) => {
+    if (confirm(`Êtes-vous sûr de vouloir désactiver l'application "${applicationName}" ?`)) {
+        router.delete(`/dashboard/applications/${applicationId}`, {
+            preserveScroll: true,
+        });
+    }
+};
 </script>
 
 <template>
@@ -329,15 +337,23 @@ const executeJob = (applicationId: number) => {
                                 <span class="font-medium">Executions:</span> Last 24 hours
                             </div>
 
-                            <!-- Execution Job Button -->
-                            <div class="flex justify-center pt-2">
+                            <!-- Action Buttons -->
+                            <div class="flex gap-2 pt-2">
                                 <button
                                     type="button"
                                     @click="executeJob(app.id)"
-                                    class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-all hover:bg-primary/90 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                                    class="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-all hover:bg-primary/90 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                                 >
                                     <Zap class="h-4 w-4" />
                                     Exécution Job
+                                </button>
+                                <button
+                                    type="button"
+                                    @click="deleteApplication(app.id, app.wording)"
+                                    class="inline-flex items-center justify-center rounded-lg bg-destructive px-3 py-2 text-sm font-medium text-destructive-foreground transition-all hover:bg-destructive/90 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-destructive focus:ring-offset-2"
+                                    title="Désactiver l'application"
+                                >
+                                    <Trash2 class="h-4 w-4" />
                                 </button>
                             </div>
                         </div>
