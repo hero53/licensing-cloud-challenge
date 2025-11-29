@@ -19,6 +19,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('dashboard/execute-job/{application}', [DashboardController::class, 'executeJob'])->name('dashboard.execute-job');
     Route::post('dashboard/upgrade-licence', [DashboardController::class, 'upgradeLicence'])->name('dashboard.upgrade-licence');
 
+    // Debug: Avancer le temps de 24h (pour tester la fenêtre glissante)
+    Route::post('dashboard/advance-time', [DashboardController::class, 'advanceTime'])->name('dashboard.advance-time');
+
     // Routes réservées aux administrateurs
     Route::middleware(['admin'])->group(function () {
         Route::get('licences', [LicenceController::class, 'index'])->name('licences.index');

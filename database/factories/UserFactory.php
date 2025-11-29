@@ -28,8 +28,12 @@ class UserFactory extends Factory
             ['wording' => 'Client', 'is_active' => true]
         );
 
+        // Récupérer une licence par défaut (Free)
+        $defaultLicence = \App\Models\Licence::where('slug', 'free')->first();
+
         return [
             'type_user_id' => $clientType->id,
+            'licence_id' => $defaultLicence?->id,
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
@@ -37,6 +41,21 @@ class UserFactory extends Factory
             'is_active' => fake()->boolean(85),
             'remember_token' => Str::random(10),
         ];
+    }
+
+    /**
+     * Configure the model factory (appelé après la création)
+     */
+    public function configure()
+    {
+        return $this->afterCreating(function (\App\Models\User $user) {
+            // Générer le token de licence après la création
+            if ($user->licence_id && $user->licence) {
+                $tokenManager = app(\App\Core\LicenceTokenManager::class);
+                $user->licence_token = $tokenManager->generateToken($user, $user->licence);
+                $user->save();
+            }
+        });
     }
 
     /**

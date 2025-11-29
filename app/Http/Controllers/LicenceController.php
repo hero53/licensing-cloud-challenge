@@ -3,44 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Models\Licence;
-use App\Models\User;
+use App\Services\LicenceService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class LicenceController extends Controller
 {
+    public function __construct(
+        private LicenceService $licenceService
+    ) {}
+
     public function index()
     {
         $this->authorize('viewAny', Licence::class);
 
-        $licences = Licence::withCount('users')
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function ($licence) {
-                return [
-                    'id' => $licence->id,
-                    'uld' => $licence->uld,
-                    'wording' => $licence->wording,
-                    'slug' => $licence->slug,
-                    'description' => $licence->description,
-                    'max_apps' => $licence->max_apps,
-                    'max_executions_per_24h' => $licence->max_executions_per_24h,
-                    'valid_from' => $licence->valid_from,
-                    'valid_to' => $licence->valid_to,
-                    'status' => $licence->status,
-                    'is_active' => $licence->is_active,
-                    'users_count' => $licence->users_count,
-                ];
-            });
-
-        $stats = [
-            'totalLicences' => Licence::count(),
-            'activeLicences' => Licence::where('status', 'ACTIVE')
-                ->where('is_active', true)
-                ->where('valid_to', '>=', now())
-                ->count(),
-            'totalUsers' => User::whereNotNull('licence_id')->count(),
-        ];
+        $licences = $this->licenceService->getAllWithUsersCount();
+        $stats = $this->licenceService->getStatistics();
 
         return Inertia::render('Licences', [
             'stats' => $stats,
@@ -61,16 +39,7 @@ class LicenceController extends Controller
             'valid_to' => 'required|date|after:valid_from',
         ]);
 
-        $licence = Licence::create([
-            'wording' => $validated['wording'],
-            'description' => $validated['description'] ?? null,
-            'max_apps' => $validated['max_apps'],
-            'max_executions_per_24h' => $validated['max_executions_per_24h'],
-            'valid_from' => $validated['valid_from'],
-            'valid_to' => $validated['valid_to'],
-            'status' => 'ACTIVE',
-            'is_active' => true,
-        ]);
+        $licence = $this->licenceService->create($validated);
 
         return back()->with('success', 'Licence "' . $licence->wording . '" créée avec succès !');
     }
@@ -88,14 +57,7 @@ class LicenceController extends Controller
             'valid_to' => 'required|date|after:valid_from',
         ]);
 
-        $licence->update([
-            'wording' => $validated['wording'],
-            'description' => $validated['description'] ?? null,
-            'max_apps' => $validated['max_apps'],
-            'max_executions_per_24h' => $validated['max_executions_per_24h'],
-            'valid_from' => $validated['valid_from'],
-            'valid_to' => $validated['valid_to'],
-        ]);
+        $this->licenceService->update($licence, $validated);
 
         return back()->with('success', 'Licence "' . $licence->wording . '" modifiée avec succès !');
     }
@@ -104,13 +66,9 @@ class LicenceController extends Controller
     {
         $this->authorize('update', $licence);
 
-        // Basculer le statut entre ACTIVE et SUSPENDED
-        $newStatus = $licence->status === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE';
-        $licence->update([
-            'status' => $newStatus,
-        ]);
-
+        $newStatus = $this->licenceService->toggleStatus($licence);
         $statusMessage = $newStatus === 'ACTIVE' ? 'activée' : 'suspendue';
+
         return back()->with('success', 'Licence "' . $licence->wording . '" ' . $statusMessage . ' avec succès !');
     }
 
@@ -118,13 +76,9 @@ class LicenceController extends Controller
     {
         $this->authorize('delete', $licence);
 
-        // Basculer le statut is_active
-        $newStatus = !$licence->is_active;
-        $licence->update([
-            'is_active' => $newStatus,
-        ]);
-
+        $newStatus = $this->licenceService->toggleActive($licence);
         $statusMessage = $newStatus ? 'activée' : 'désactivée';
+
         return back()->with('success', 'Licence "' . $licence->wording . '" ' . $statusMessage . ' avec succès !');
     }
 }
