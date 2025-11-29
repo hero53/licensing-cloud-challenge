@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('uld')->unique();
             $table->foreignId('type_user_id')->constrained('type_users')->onDelete('cascade');
+            $table->foreignId('licence_id')->constrained('licences')->onDelete('cascade');
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
