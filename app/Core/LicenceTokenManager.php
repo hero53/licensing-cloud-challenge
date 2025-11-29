@@ -7,16 +7,16 @@ use App\Models\User;
 use App\Models\Licence;
 
 /**
- * Gestionnaire de tokens de licence
+ * License token manager
  *
- * Permet de créer un token encodé contenant toutes les infos de la licence
- * pour éviter les requêtes SQL à chaque vérification
+ * Creates an encoded token containing all license information
+ * to avoid SQL queries on every verification
  */
 class LicenceTokenManager
 {
     /**
-     * Générer un token pour un utilisateur et sa licence
-     * Le token contient toutes les infos nécessaires
+     * Generate a token for a user and their license
+     * The token contains all necessary information
      */
     public function generateToken(User $user, Licence $licence): string
     {
@@ -34,13 +34,13 @@ class LicenceTokenManager
             'generated_at' => now()->toDateTimeString(),
         ];
 
-        // Convertir en JSON puis encrypter
+        // Convert to JSON then encrypt
         $json = json_encode($data);
         return Crypt::encryptString($json);
     }
 
     /**
-     * Décoder un token et retourner les infos de la licence
+     * Decode a token and return license information
      */
     public function decodeToken(string $token): array
     {
@@ -53,19 +53,19 @@ class LicenceTokenManager
     }
 
     /**
-     * Vérifier si le token est encore valide (pas expiré)
+     * Check if the token is still valid (not expired)
      */
     public function isTokenValid(string $token): bool
     {
         try {
             $data = $this->decodeToken($token);
 
-            // Vérifier que la licence n'est pas expirée
+            // Check that the license is not expired
             if (strtotime($data['valid_to']) < time()) {
                 return false;
             }
 
-            // Vérifier que le statut est ACTIVE
+            // Check that the status is ACTIVE
             if ($data['status'] !== 'ACTIVE') {
                 return false;
             }
@@ -77,8 +77,8 @@ class LicenceTokenManager
     }
 
     /**
-     * Obtenir les infos de la licence depuis le token
-     * Retourne un objet stdClass pour faciliter l'accès (->max_apps au lieu de ['max_apps'])
+     * Get license information from the token
+     * Returns a stdClass object for easier access (->max_apps instead of ['max_apps'])
      */
     public function getLicenceData(?string $token): object
     {
@@ -91,7 +91,7 @@ class LicenceTokenManager
     }
 
     /**
-     * Obtenir une info spécifique du token
+     * Get a specific value from the token
      */
     public function getTokenValue(string $token, string $key): mixed
     {
@@ -100,8 +100,8 @@ class LicenceTokenManager
     }
 
     /**
-     * Régénérer le token d'un utilisateur
-     * Utilisé lors d'un upgrade de licence
+     * Regenerate a user's token
+     * Used when upgrading a license
      */
     public function regenerateUserToken(User $user): string
     {

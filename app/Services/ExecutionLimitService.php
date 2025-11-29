@@ -16,14 +16,14 @@ class ExecutionLimitService
     ) {}
     /**
      * Check if user has reached execution limit
-     * Utilise le token de licence (pas de requête SQL) et la fenêtre glissante
+     * Uses license token (no SQL query) and sliding window
      */
     public function hasReachedExecutionLimit(User $user): bool
     {
-        // Décoder le token pour avoir les infos de la licence (pas de requête SQL!)
+        // Decode the token to get license info (no SQL query!)
         $licenceData = $this->tokenManager->getLicenceData($user->licence_token);
 
-        // Pour chaque application de l'utilisateur, nettoyer la fenêtre glissante
+        // For each user's application, clean the sliding window
         $user->applications()->each(function ($application) use ($user) {
             $this->slidingWindow->nettoyerAnciennesExecutions($user->id, $application->id);
         });
@@ -34,11 +34,11 @@ class ExecutionLimitService
 
     /**
      * Check if user has reached application limit
-     * Utilise le token de licence (pas de requête SQL)
+     * Uses license token (no SQL query)
      */
     public function hasReachedApplicationLimit(User $user): bool
     {
-        // Décoder le token pour avoir les infos de la licence
+        // Decode the token to get license info
         $licenceData = $this->tokenManager->getLicenceData($user->licence_token);
 
         $currentApplicationsCount = $user->applications()
@@ -50,7 +50,7 @@ class ExecutionLimitService
 
     /**
      * Get executions count in the last 24 hours
-     * Compte seulement les exécutions actives (is_active = true)
+     * Only counts active executions (is_active = true)
      */
     public function getExecutionsLast24h(User $user): int
     {
@@ -62,7 +62,7 @@ class ExecutionLimitService
 
     /**
      * Get executions count for today
-     * Compte seulement les exécutions actives (is_active = true)
+     * Only counts active executions (is_active = true)
      */
     public function getExecutionsToday(User $user): int
     {
@@ -74,11 +74,11 @@ class ExecutionLimitService
 
     /**
      * Get executions count for a specific application in the last 24h
-     * Nettoie d'abord la fenêtre glissante puis compte les exécutions actives
+     * Cleans the sliding window first, then counts active executions
      */
     public function getApplicationExecutionsLast24h(User $user, Application $application): int
     {
-        // Nettoyer la fenêtre glissante avant de compter
+        // Clean the sliding window before counting
         $this->slidingWindow->nettoyerAnciennesExecutions($user->id, $application->id);
 
         return $user->userApplicationJobs()
@@ -90,14 +90,14 @@ class ExecutionLimitService
 
     /**
      * Record a job execution
-     * Nettoie la fenêtre glissante AVANT de créer la nouvelle exécution
+     * Cleans the sliding window BEFORE creating the new execution
      */
     public function recordExecution(User $user, Application $application, int $jobApplicationId): void
     {
-        // 1. Nettoyer la fenêtre glissante avant de créer la nouvelle exécution
+        // 1. Clean the sliding window before creating the new execution
         $this->slidingWindow->nettoyerAnciennesExecutions($user->id, $application->id);
 
-        // 2. Créer la nouvelle exécution (is_active sera automatiquement true par défaut)
+        // 2. Create the new execution (is_active will be automatically true by default)
         $user->userApplicationJobs()->create([
             'application_id' => $application->id,
             'job_application_id' => $jobApplicationId,
@@ -106,11 +106,11 @@ class ExecutionLimitService
 
     /**
      * Get execution statistics for user
-     * Utilise le token de licence
+     * Uses license token
      */
     public function getExecutionStats(User $user): array
     {
-        // Décoder le token pour avoir les infos de la licence
+        // Decode the token to get license info
         $licenceData = $this->tokenManager->getLicenceData($user->licence_token);
 
         return [
@@ -122,19 +122,31 @@ class ExecutionLimitService
     }
 
     /**
-     * Nettoie toutes les fenêtres glissantes pour toutes les applications d'un utilisateur
-     * Utile pour faire un grand nettoyage avant d'afficher les statistiques
+     * Clean all sliding windows for all user applications
+     * Useful for a complete cleanup before displaying statistics
      */
     public function nettoyerToutesLesFenetres(User $user): int
     {
         $totalDesactive = 0;
 
-        // Pour chaque application de l'utilisateur
+        // For each user application
         $user->applications()->each(function ($application) use ($user, &$totalDesactive) {
             $nbDesactive = $this->slidingWindow->nettoyerAnciennesExecutions($user->id, $application->id);
             $totalDesactive += $nbDesactive;
         });
 
         return $totalDesactive;
+    }
+
+    /**
+     * Simulate time advancement by deactivating all active executions
+     * Debug method to test the sliding window mechanism
+     */
+    public function simulateTimeAdvancement(User $user): int
+    {
+        return \DB::table('user_application_job')
+            ->where('user_id', $user->id)
+            ->where('is_active', true)
+            ->update(['is_active' => false]);
     }
 }

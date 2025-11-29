@@ -6,29 +6,29 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 /**
- * Classe pour gérer la fenêtre glissante de 24 heures
+ * Class to manage the 24-hour sliding window
  *
- * Explication simple:
- * Une fenêtre glissante de 24h = on compte seulement les exécutions des 24 dernières heures
- * Exemple: Si on est le 30 nov à 10h, on compte seulement depuis le 29 nov à 10h
+ * Simple explanation:
+ * A 24h sliding window = we only count executions from the last 24 hours
+ * Example: If it's Nov 30 at 10am, we only count since Nov 29 at 10am
  */
 class SlidingWindow
 {
     /**
-     * Nettoyer les anciennes exécutions (plus de 24h)
-     * = Désactiver les exécutions qui sont sorties de la fenêtre
+     * Clean old executions (older than 24h)
+     * = Deactivate executions that are outside the window
      *
-     * @param int $userId - L'utilisateur
-     * @param int $applicationId - L'application
-     * @return int - Nombre d'exécutions désactivées
+     * @param int $userId - The user
+     * @param int $applicationId - The application
+     * @return int - Number of deactivated executions
      */
     public function nettoyerAnciennesExecutions(int $userId, int $applicationId): int
     {
-        // 1. Calculer la date limite (il y a 24 heures)
+        // 1. Calculate the cutoff date (24 hours ago)
         $dateLimite = Carbon::now()->subHours(24);
 
-        // 2. Trouver les exécutions qui sont trop vieilles
-        // (créées avant la date limite ET encore actives)
+        // 2. Find executions that are too old
+        // (created before cutoff date AND still active)
         $executionsADesactiver = DB::table('user_application_job')
             ->where('user_id', $userId)
             ->where('application_id', $applicationId)
@@ -36,7 +36,7 @@ class SlidingWindow
             ->where('created_at', '<', $dateLimite)
             ->count();
 
-        // 3. Désactiver ces exécutions (ne pas supprimer!)
+        // 3. Deactivate these executions (do not delete!)
         DB::table('user_application_job')
             ->where('user_id', $userId)
             ->where('application_id', $applicationId)
@@ -48,20 +48,20 @@ class SlidingWindow
     }
 
     /**
-     * Compter combien d'exécutions actives dans les 24 dernières heures
+     * Count active executions in the last 24 hours
      *
-     * @param int $userId - L'utilisateur
-     * @param int $applicationId - L'application
-     * @return int - Nombre d'exécutions actives dans la fenêtre
+     * @param int $userId - The user
+     * @param int $applicationId - The application
+     * @return int - Number of active executions in the window
      */
     public function compterExecutionsActives(int $userId, int $applicationId): int
     {
-        // 1. Calculer la date limite (il y a 24 heures)
+        // 1. Calculate the cutoff date (24 hours ago)
         $dateLimite = Carbon::now()->subHours(24);
 
-        // 2. Compter seulement les exécutions:
-        //    - qui sont actives (is_active = true)
-        //    - créées dans les 24 dernières heures
+        // 2. Count only executions that are:
+        //    - active (is_active = true)
+        //    - created in the last 24 hours
         return DB::table('user_application_job')
             ->where('user_id', $userId)
             ->where('application_id', $applicationId)
@@ -71,42 +71,42 @@ class SlidingWindow
     }
 
     /**
-     * Vérifier si on peut créer une nouvelle exécution
+     * Check if a new execution can be created
      *
-     * @param int $userId - L'utilisateur
-     * @param int $applicationId - L'application
-     * @param int $quotaMax - Le quota maximum (exemple: 100)
-     * @return bool - true si on peut créer, false sinon
+     * @param int $userId - The user
+     * @param int $applicationId - The application
+     * @param int $quotaMax - The maximum quota (example: 100)
+     * @return bool - true if can create, false otherwise
      */
     public function peutCreerNouvelleExecution(int $userId, int $applicationId, int $quotaMax): bool
     {
-        // 1. Nettoyer d'abord les anciennes exécutions
+        // 1. Clean old executions first
         $this->nettoyerAnciennesExecutions($userId, $applicationId);
 
-        // 2. Compter les exécutions actives
+        // 2. Count active executions
         $executionsActives = $this->compterExecutionsActives($userId, $applicationId);
 
-        // 3. Vérifier si on est en dessous du quota
+        // 3. Check if below quota
         return $executionsActives < $quotaMax;
     }
 
     /**
-     * Obtenir des informations détaillées sur l'état de la fenêtre
+     * Get detailed information about the window state
      *
-     * @param int $userId - L'utilisateur
-     * @param int $applicationId - L'application
-     * @param int $quotaMax - Le quota maximum
-     * @return array - Informations détaillées
+     * @param int $userId - The user
+     * @param int $applicationId - The application
+     * @param int $quotaMax - The maximum quota
+     * @return array - Detailed information
      */
     public function obtenirInfosFenetre(int $userId, int $applicationId, int $quotaMax): array
     {
-        // 1. Nettoyer les anciennes
+        // 1. Clean old executions
         $desactivees = $this->nettoyerAnciennesExecutions($userId, $applicationId);
 
-        // 2. Compter les actives
+        // 2. Count active executions
         $actives = $this->compterExecutionsActives($userId, $applicationId);
 
-        // 3. Calculer ce qui reste
+        // 3. Calculate remaining quota
         $restant = max(0, $quotaMax - $actives);
 
         return [

@@ -25,10 +25,10 @@ class DashboardController extends Controller
         /** @var \App\Models\User $user */
         $user = auth()->user();
 
-        // Décoder le token pour avoir les infos de la licence (pas de requête SQL!)
+        // Decode the token to get license info (no SQL query!)
         $licenceData = $this->tokenManager->getLicenceData($user->licence_token);
 
-        // Nettoyer toutes les fenêtres glissantes AVANT d'afficher les statistiques
+        // Clean all sliding windows BEFORE displaying statistics
         $this->executionLimitService->nettoyerToutesLesFenetres($user);
 
         $applications = $this->applicationService->getAccessibleApplications($user);
@@ -58,7 +58,7 @@ class DashboardController extends Controller
         /** @var \App\Models\User $user */
         $user = auth()->user();
 
-        // Décoder le token pour avoir les infos de la licence
+        // Decode the token to get license info
         $licenceData = $this->tokenManager->getLicenceData($user->licence_token);
 
         if (!$this->applicationService->isActive($application)) {
@@ -89,7 +89,7 @@ class DashboardController extends Controller
         /** @var \App\Models\User $user */
         $user = auth()->user();
 
-        // Décoder le token pour avoir les infos de la licence
+        // Decode the token to get license info
         $licenceData = $this->tokenManager->getLicenceData($user->licence_token);
 
         if ($this->executionLimitService->hasReachedApplicationLimit($user)) {
@@ -148,19 +148,15 @@ class DashboardController extends Controller
     }
 
     /**
-     * Désactiver toutes les exécutions actives (debug)
-     * Simule le passage de 24h en mettant is_active = false
+     * Deactivate all active executions (debug)
+     * Simulates 24 hours time advance by setting is_active = false
      */
     public function advanceTime()
     {
         /** @var \App\Models\User $user */
         $user = auth()->user();
 
-        // Désactiver toutes les exécutions actives de cet utilisateur
-        $deactivated = \DB::table('user_application_job')
-            ->where('user_id', $user->id)
-            ->where('is_active', true)
-            ->update(['is_active' => false]);
+        $deactivated = $this->executionLimitService->simulateTimeAdvancement($user);
 
         return back()->with('success', "Fenêtre glissante simulée ! {$deactivated} exécutions désactivées");
     }
