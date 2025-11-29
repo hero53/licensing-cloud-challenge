@@ -16,7 +16,7 @@ class DashboardController extends Controller
 
         // Récupérer les applications avec le nombre d'exécutions des dernières 24h
         $applications = Application::where('is_active', true)
-            ->with(['licence.user', 'jobApplications.jobExecutions'])
+            ->with(['user.licence', 'jobApplications.jobExecutions'])
             ->get()
             ->map(function ($app) {
                 // Compter les exécutions des dernières 24h
@@ -32,9 +32,9 @@ class DashboardController extends Controller
                     'description' => $app->description,
                     'executions_24h' => $executions24h,
                     'licence' => [
-                        'wording' => $app->licence->wording,
+                        'wording' => $app->user->licence->wording,
                         'user' => [
-                            'name' => $app->licence->user->name,
+                            'name' => $app->user->name,
                         ],
                     ],
                 ];

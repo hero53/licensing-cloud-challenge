@@ -22,6 +22,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'type_user_id',
+        'licence_id',
         'name',
         'email',
         'password',
@@ -55,18 +56,53 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * Get the type user associated with this user.
+     */
     public function typeUser()
     {
         return $this->belongsTo(TypeUser::class);
     }
 
-    public function licences()
+    /**
+     * Get the licence associated with this user.
+     */
+    public function licence()
     {
-        return $this->hasMany(Licence::class);
+        return $this->belongsTo(Licence::class);
     }
 
+    /**
+     * Get all applications owned by this user.
+     */
+    public function applications()
+    {
+        return $this->hasMany(Application::class);
+    }
+
+    /**
+     * Get all job executions for this user.
+     */
     public function jobExecutions()
     {
         return $this->hasMany(JobExecution::class);
+    }
+
+    /**
+     * Get all user-application-job relationships for this user.
+     */
+    public function userApplicationJobs()
+    {
+        return $this->hasMany(UserApplicationJob::class);
+    }
+
+    /**
+     * Get all authorized applications through the pivot table.
+     */
+    public function authorizedApplications()
+    {
+        return $this->belongsToMany(Application::class, 'user_application_job')
+            ->withPivot('job_application_id')
+            ->withTimestamps();
     }
 }

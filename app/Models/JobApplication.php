@@ -6,6 +6,8 @@ use App\Traits\HasSlug;
 use App\Traits\HasUld;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class JobApplication extends Model
 {
@@ -17,13 +19,27 @@ class JobApplication extends Model
         'slug',
     ];
 
-    public function application()
+    /**
+     * Get the application that owns the job application.
+     */
+    public function application(): BelongsTo
     {
         return $this->belongsTo(Application::class);
     }
 
-    public function jobExecutions()
+    /**
+     * Get all job executions for this job application.
+     */
+    public function jobExecutions(): HasMany
     {
         return $this->hasMany(JobExecution::class);
+    }
+
+    /**
+     * Get all user-application-job relationships for this job application.
+     */
+    public function userApplicationJobs(): HasMany
+    {
+        return $this->hasMany(UserApplicationJob::class);
     }
 }

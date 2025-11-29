@@ -17,7 +17,8 @@ class TypeUserFactory extends Factory
     public function definition(): array
     {
         return [
-            'wording' => 'Client',
+            'wording' => fake()->randomElement(['Administrateur', 'Client']),
+            'slug' => fake()->unique()->slug(),
             'is_active' => true,
         ];
     }
@@ -28,7 +29,8 @@ class TypeUserFactory extends Factory
     public function admin(): static
     {
         return $this->state(fn (array $attributes) => [
-            'wording' => 'Admin',
+            'wording' => 'Administrateur',
+            'slug' => 'admin',
         ]);
     }
 
@@ -39,6 +41,7 @@ class TypeUserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'wording' => 'Client',
+            'slug' => 'client',
         ]);
     }
 }

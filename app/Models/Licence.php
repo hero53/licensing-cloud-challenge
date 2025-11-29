@@ -7,13 +7,13 @@ use App\Traits\HasSlug;
 use App\Traits\HasUld;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Licence extends Model
 {
     use HasFactory, HasUld, HasSlug, HasActiveStatus;
 
     protected $fillable = [
-        'user_id',
         'wording',
         'slug',
         'description',
@@ -33,13 +33,11 @@ class Licence extends Model
         'max_executions_per_24h' => 'integer',
     ];
 
-    public function user()
+    /**
+     * Get all users associated with this licence.
+     */
+    public function users(): HasMany
     {
-        return $this->belongsTo(User::class);
-    }
-
-    public function applications()
-    {
-        return $this->hasMany(Application::class);
+        return $this->hasMany(User::class);
     }
 }
