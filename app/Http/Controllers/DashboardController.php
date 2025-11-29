@@ -146,4 +146,22 @@ class DashboardController extends Controller
 
         return back()->with('success', 'L\'application "' . $application->wording . '" a été désactivée avec succès.');
     }
+
+    /**
+     * Désactiver toutes les exécutions actives (debug)
+     * Simule le passage de 24h en mettant is_active = false
+     */
+    public function advanceTime()
+    {
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+
+        // Désactiver toutes les exécutions actives de cet utilisateur
+        $deactivated = \DB::table('user_application_job')
+            ->where('user_id', $user->id)
+            ->where('is_active', true)
+            ->update(['is_active' => false]);
+
+        return back()->with('success', "Fenêtre glissante simulée ! {$deactivated} exécutions désactivées");
+    }
 }

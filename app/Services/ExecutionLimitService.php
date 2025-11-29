@@ -62,10 +62,12 @@ class ExecutionLimitService
 
     /**
      * Get executions count for today
+     * Compte seulement les exécutions actives (is_active = true)
      */
     public function getExecutionsToday(User $user): int
     {
         return $user->userApplicationJobs()
+            ->where('is_active', true)
             ->whereDate('created_at', today())
             ->count();
     }
