@@ -28,14 +28,6 @@ class JobApplication extends Model
     }
 
     /**
-     * Get all job executions for this job application.
-     */
-    public function jobExecutions(): HasMany
-    {
-        return $this->hasMany(JobExecution::class);
-    }
-
-    /**
      * Get all user-application-job relationships for this job application.
      */
     public function userApplicationJobs(): HasMany

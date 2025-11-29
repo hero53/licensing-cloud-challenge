@@ -81,14 +81,6 @@ class User extends Authenticatable
     }
 
     /**
-     * Get all job executions for this user.
-     */
-    public function jobExecutions()
-    {
-        return $this->hasMany(JobExecution::class);
-    }
-
-    /**
      * Get all user-application-job relationships for this user.
      */
     public function userApplicationJobs()

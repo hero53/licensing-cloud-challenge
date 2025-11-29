@@ -7,6 +7,7 @@ use App\Traits\HasSlug;
 use App\Traits\HasUld;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Licence extends Model
@@ -23,12 +24,15 @@ class Licence extends Model
         'valid_to',
         'status',
         'is_active',
+        'is_custom',
+        'created_by_user_id',
     ];
 
     protected $casts = [
         'valid_from' => 'datetime',
         'valid_to' => 'datetime',
         'is_active' => 'boolean',
+        'is_custom' => 'boolean',
         'max_apps' => 'integer',
         'max_executions_per_24h' => 'integer',
     ];
@@ -39,5 +43,13 @@ class Licence extends Model
     public function users(): HasMany
     {
         return $this->hasMany(User::class);
+    }
+
+    /**
+     * Get the user who created this custom licence.
+     */
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by_user_id');
     }
 }

@@ -19,8 +19,9 @@ return new class extends Migration
             $table->timestamps();
 
             // Index pour optimiser les requêtes
-            $table->unique(['user_id', 'application_id', 'job_application_id'], 'user_app_job_unique');
-            $table->index(['user_id', 'application_id']);
+            $table->index(['user_id', 'application_id', 'job_application_id'], 'user_app_job_idx');
+            $table->index(['user_id', 'application_id'], 'user_app_idx');
+            $table->index('created_at', 'created_at_idx');
         });
     }
 
