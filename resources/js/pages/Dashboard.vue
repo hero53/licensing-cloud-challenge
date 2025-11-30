@@ -50,7 +50,7 @@ const props = defineProps<{
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Dashboard',
+        title: 'Tableau de bord',
         href: '/dashboard',
     },
 ];
@@ -181,7 +181,7 @@ const deleteApplication = (applicationId: number, applicationName: string) => {
 </script>
 
 <template>
-    <Head title="Dashboard" />
+    <Head title="Tableau de bord" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div
@@ -196,7 +196,7 @@ const deleteApplication = (applicationId: number, applicationName: string) => {
                     <AlertTriangle class="h-5 w-5 flex-shrink-0 text-yellow-600 dark:text-yellow-500" />
                     <div class="flex-1">
                         <h3 class="font-semibold text-yellow-800 dark:text-yellow-200">
-                            Limite atteinte !
+                            Limite atteinte!
                         </h3>
                         <p class="mt-1 text-sm text-yellow-700 dark:text-yellow-300">
                             <span v-if="appsLimitReached">
@@ -225,7 +225,7 @@ const deleteApplication = (applicationId: number, applicationName: string) => {
                     class="flex flex-col gap-3 rounded-xl border border-sidebar-border/70 bg-card p-6 dark:border-sidebar-border"
                 >
                     <div class="flex items-center justify-between">
-                        <span class="text-sm font-medium text-muted-foreground">Ma Licence</span>
+                        <span class="text-sm font-medium text-muted-foreground">Licence</span>
                         <Key class="h-4 w-4 text-muted-foreground" />
                     </div>
                     <div class="space-y-1">
@@ -257,7 +257,7 @@ const deleteApplication = (applicationId: number, applicationName: string) => {
                     class="flex flex-col gap-3 rounded-xl border border-sidebar-border/70 bg-card p-6 dark:border-sidebar-border"
                 >
                     <div class="flex items-center justify-between">
-                        <span class="text-sm font-medium text-muted-foreground">Executions Today</span>
+                        <span class="text-sm font-medium text-muted-foreground">Exécutions d'aujourd'hui</span>
                         <Zap class="h-4 w-4 text-muted-foreground" />
                     </div>
                     <div class="space-y-1">
@@ -274,7 +274,7 @@ const deleteApplication = (applicationId: number, applicationName: string) => {
                 <div class="mb-6 flex items-center justify-between">
                     <div>
                         <h2 class="text-2xl font-bold tracking-tight">Applications</h2>
-                        <p class="text-sm text-muted-foreground">Monitor your application executions in real-time</p>
+                        <p class="text-sm text-muted-foreground">Surveillez vos exécutions d'applications en temps réel</p>
                     </div>
                     <button
                         @click="openModal"
@@ -316,7 +316,7 @@ const deleteApplication = (applicationId: number, applicationName: string) => {
                                     {{ app.description }}
                                 </p>
                                 <p v-else class="text-sm text-muted-foreground/60 italic">
-                                    No description available
+                                    Aucune description disponible
                                 </p>
                             </div>
 
@@ -334,7 +334,7 @@ const deleteApplication = (applicationId: number, applicationName: string) => {
 
                             <!-- Execution count label -->
                             <div class="text-xs text-muted-foreground">
-                                <span class="font-medium">Executions:</span> Last 24 hours
+                                <span class="font-medium">Exécutions:</span> Dernières 24 heures
                             </div>
 
                             <!-- Action Buttons -->
@@ -367,9 +367,9 @@ const deleteApplication = (applicationId: number, applicationName: string) => {
                 >
                     <div class="text-center">
                         <Rocket class="mx-auto h-12 w-12 text-muted-foreground/50" />
-                        <h3 class="mt-4 text-lg font-semibold">No applications yet</h3>
+                        <h3 class="mt-4 text-lg font-semibold">Aucune application pour l'instant</h3>
                         <p class="mt-2 text-sm text-muted-foreground">
-                            Applications will appear here once they are registered
+                            Les applications apparaîtront ici une fois qu'elles seront enregistrées
                         </p>
                     </div>
                 </div>
@@ -495,7 +495,7 @@ const deleteApplication = (applicationId: number, applicationName: string) => {
                                         <TrendingUp class="h-5 w-5 text-white" />
                                     </div>
                                     <div>
-                                        <h4 class="font-semibold">Licence Personnalisée</h4>
+                                        <h4 class="font-semibold">Licence personnalisée</h4>
                                         <p class="text-xs text-muted-foreground">
                                             Définissez vos propres limites
                                         </p>
@@ -531,7 +531,7 @@ const deleteApplication = (applicationId: number, applicationName: string) => {
                                 v-if="licence.id === currentLicenceId"
                                 class="absolute -top-2 -right-2 rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground border border-sidebar-border/70"
                             >
-                                Licence Actuelle
+                                Licence actuelle
                             </div>
 
                             <div class="flex items-start justify-between">
@@ -558,11 +558,11 @@ const deleteApplication = (applicationId: number, applicationName: string) => {
 
                             <div class="mt-4 space-y-2 border-t border-sidebar-border/50 pt-3">
                                 <div class="flex items-center justify-between text-sm">
-                                    <span class="text-muted-foreground">Max Applications:</span>
+                                    <span class="text-muted-foreground">Max applications:</span>
                                     <span class="font-semibold">{{ licence.max_apps }}</span>
                                 </div>
                                 <div class="flex items-center justify-between text-sm">
-                                    <span class="text-muted-foreground">Max Exec/24h:</span>
+                                    <span class="text-muted-foreground">Max exec/24h:</span>
                                     <span class="font-semibold">{{ licence.max_executions_per_24h }}</span>
                                 </div>
                             </div>
@@ -571,7 +571,7 @@ const deleteApplication = (applicationId: number, applicationName: string) => {
 
                     <!-- Formulaire pour Licence Personnalisée -->
                     <div v-if="isCustomLicence" class="rounded-xl border border-primary/30 bg-primary/5 p-4">
-                        <h4 class="mb-3 font-semibold">Configurez votre licence personnalisée</h4>
+                        <h4 class="mb-3 font-semibold">Configurez votre licence</h4>
                         <div class="space-y-3">
                             <div>
                                 <label for="custom_wording" class="block text-sm font-medium mb-1">

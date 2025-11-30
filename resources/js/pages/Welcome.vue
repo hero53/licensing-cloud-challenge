@@ -12,7 +12,7 @@ withDefaults(
 </script>
 
 <template>
-    <Head title="Welcome">
+    <Head title="Bienvenue">
         <link rel="preconnect" href="https://rsms.me/" />
         <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
     </Head>
@@ -28,21 +28,21 @@ withDefaults(
                     href="/dashboard"
                     class="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
                 >
-                    Dashboard
+                    Tableau de bord
                 </Link>
                 <template v-else>
                     <Link
                         href="/login"
                         class="inline-block rounded-sm border border-transparent px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#19140035] dark:text-[#EDEDEC] dark:hover:border-[#3E3E3A]"
                     >
-                        Log in
+                        Connexion
                     </Link>
                     <Link
                         v-if="canRegister"
                         href="/register"
                         class="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
                     >
-                        Register
+                        Inscription
                     </Link>
                 </template>
             </nav>
@@ -56,10 +56,10 @@ withDefaults(
                 <div
                     class="flex-1 rounded-br-lg rounded-bl-lg bg-white p-6 pb-12 text-[13px] leading-[20px] shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] lg:rounded-tl-lg lg:rounded-br-none lg:p-20 dark:bg-[#161615] dark:text-[#EDEDEC] dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d]"
                 >
-                    <h1 class="mb-1 font-medium">Let's get started</h1>
+                    <h1 class="mb-1 font-medium">Commençons</h1>
                     <p class="mb-2 text-[#706f6c] dark:text-[#A1A09A]">
-                        Laravel has an incredibly rich ecosystem. <br />We
-                        suggest starting with the following.
+                        Laravel dispose d'un écosystème incroyablement riche. <br />Nous
+                        vous suggérons de commencer par ce qui suit.
                     </p>
                     <ul class="mb-4 flex flex-col lg:mb-6">
                         <li
@@ -77,7 +77,7 @@ withDefaults(
                                 </span>
                             </span>
                             <span>
-                                Read the
+                                Lire la
                                 <a
                                     href="https://laravel.com/docs"
                                     target="_blank"
@@ -116,7 +116,7 @@ withDefaults(
                                 </span>
                             </span>
                             <span>
-                                Watch video tutorials at
+                                Regarder des tutoriels vidéo sur
                                 <a
                                     href="https://laracasts.com"
                                     target="_blank"
@@ -148,7 +148,7 @@ withDefaults(
                                 target="_blank"
                                 class="inline-block rounded-sm border border-black bg-[#1b1b18] px-5 py-1.5 text-sm leading-normal text-white hover:border-black hover:bg-black dark:border-[#eeeeec] dark:bg-[#eeeeec] dark:text-[#1C1C1A] dark:hover:border-white dark:hover:bg-white"
                             >
-                                Deploy now
+                                Déployer maintenant
                             </a>
                         </li>
                     </ul>

@@ -33,7 +33,7 @@ defineProps<{
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Dashboard',
+        title: 'Tableau de bord',
         href: '/dashboard',
     },
     {
@@ -170,6 +170,7 @@ const toggleStatus = (licenceId: number, licenceName: string, currentStatus: str
 <template>
     <Head title="Licences" />
 
+
     <AppLayout :breadcrumbs="breadcrumbs">
         <div
             class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4"
@@ -186,7 +187,7 @@ const toggleStatus = (licenceId: number, licenceName: string, currentStatus: str
                     </div>
                     <div class="space-y-1">
                         <div class="text-2xl font-bold">{{ stats.totalLicences }}</div>
-                        <p class="text-xs text-muted-foreground">Toutes les licences</p>
+                        <p class="text-xs text-muted-foreground">Toutes licences</p>
                     </div>
                 </div>
 
@@ -195,7 +196,7 @@ const toggleStatus = (licenceId: number, licenceName: string, currentStatus: str
                     class="flex flex-col gap-3 rounded-xl border border-sidebar-border/70 bg-card p-6 dark:border-sidebar-border"
                 >
                     <div class="flex items-center justify-between">
-                        <span class="text-sm font-medium text-muted-foreground">Licences Actives</span>
+                        <span class="text-sm font-medium text-muted-foreground">Licences actives</span>
                         <CheckCircle class="h-4 w-4 text-muted-foreground" />
                     </div>
                     <div class="space-y-1">
@@ -274,11 +275,11 @@ const toggleStatus = (licenceId: number, licenceName: string, currentStatus: str
                             <!-- Limits -->
                             <div class="space-y-2 border-t border-sidebar-border/50 pt-4">
                                 <div class="flex items-center justify-between text-sm">
-                                    <span class="text-muted-foreground">Max Apps:</span>
+                                    <span class="text-muted-foreground">Max applications:</span>
                                     <span class="font-semibold">{{ licence.max_apps }}</span>
                                 </div>
                                 <div class="flex items-center justify-between text-sm">
-                                    <span class="text-muted-foreground">Max Exec/24h:</span>
+                                    <span class="text-muted-foreground">Max exec/24h:</span>
                                     <span class="font-semibold">{{ licence.max_executions_per_24h }}</span>
                                 </div>
                                 <div class="flex items-center justify-between text-sm">
@@ -336,7 +337,7 @@ const toggleStatus = (licenceId: number, licenceName: string, currentStatus: str
                         <Key class="mx-auto h-12 w-12 text-muted-foreground/50" />
                         <h3 class="mt-4 text-lg font-semibold">Aucune licence</h3>
                         <p class="mt-2 text-sm text-muted-foreground">
-                            Créez votre première licence pour commencer
+                            Créez votre première licence pour débuter
                         </p>
                     </div>
                 </div>
