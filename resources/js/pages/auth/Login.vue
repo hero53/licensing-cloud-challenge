@@ -33,6 +33,23 @@ defineProps<{
             {{ status }}
         </div>
 
+        <!-- Identifiants de test -->
+        <div class="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-900/20">
+            <h3 class="mb-2 text-sm font-semibold text-blue-800 dark:text-blue-200">
+                🔑 Identifiants de test
+            </h3>
+            <div class="space-y-1.5 text-xs text-blue-700 dark:text-blue-300">
+                <div class="rounded bg-white/50 px-2 py-1.5 dark:bg-black/20">
+                    <p class="font-medium mb-1">Admin :</p>
+                    <p class="font-mono">Login:admin@example.com / Password: admin</p>
+                </div>
+                <div class="rounded bg-white/50 px-2 py-1.5 dark:bg-black/20">
+                    <p class="font-medium mb-1">Client :</p>
+                    <p class="font-mono">Login: client@example.com / Password: client</p>
+                </div>
+            </div>
+        </div>
+
         <Form
             v-bind="store.form()"
             :reset-on-success="['password']"
@@ -79,12 +96,12 @@ defineProps<{
                     <InputError :message="errors.password" />
                 </div>
 
-                <div class="flex items-center justify-between">
+                <!-- <div class="flex items-center justify-between">
                     <Label for="remember" class="flex items-center space-x-3">
                         <Checkbox id="remember" name="remember" :tabindex="3" />
                         <span>Se souvenir de moi</span>
                     </Label>
-                </div>
+                </div> -->
 
                 <Button
                     type="submit"
