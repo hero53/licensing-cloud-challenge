@@ -13,9 +13,17 @@ class TypeUserSeeder extends Seeder
     public function run(): void
     {
         // Créer le type Administrateur
-        TypeUser::factory()->admin()->create();
+        TypeUser::create([
+            'wording' => 'Administrateur',
+            'slug' => 'admin',
+            'is_active' => true,
+        ]);
 
         // Créer le type Client
-        TypeUser::factory()->client()->create();
+        TypeUser::create([
+            'wording' => 'Client',
+            'slug' => 'client',
+            'is_active' => true,
+        ]);
     }
 }

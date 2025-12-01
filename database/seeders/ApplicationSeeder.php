@@ -20,13 +20,17 @@ class ApplicationSeeder extends Seeder
         // Pour chaque utilisateur, créer une application
         foreach ($users as $user) {
             // Créer une application pour cet utilisateur
-            $application = Application::factory()->create([
+            $application = Application::create([
                 'user_id' => $user->id,
+                'wording' => 'Application ' . $user->name,
+                'description' => 'Application de test pour ' . $user->name,
+                'is_active' => true,
             ]);
 
             // Créer un job_application associé à cette application
-            JobApplication::factory()->create([
+            JobApplication::create([
                 'application_id' => $application->id,
+                'wording' => 'Job pour ' . $application->wording,
             ]);
         }
     }
