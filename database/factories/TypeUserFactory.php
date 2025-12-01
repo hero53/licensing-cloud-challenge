@@ -17,8 +17,8 @@ class TypeUserFactory extends Factory
     public function definition(): array
     {
         return [
-            'wording' => fake()->randomElement(['Administrateur', 'Client']),
-            'slug' => fake()->unique()->slug(),
+            'wording' => $this->faker->randomElement(['Administrateur', 'Client']),
+            'slug' => $this->faker->unique()->slug(),
             'is_active' => true,
         ];
     }

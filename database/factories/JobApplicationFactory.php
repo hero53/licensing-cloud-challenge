@@ -18,7 +18,7 @@ class JobApplicationFactory extends Factory
     {
         return [
             'application_id' => \App\Models\Application::factory(),
-            'wording' => fake()->words(3, true),
+            'wording' => $this->faker->words(3, true),
         ];
     }
 }

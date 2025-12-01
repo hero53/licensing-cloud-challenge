@@ -16,20 +16,20 @@ class LicenceFactory extends Factory
      */
     public function definition(): array
     {
-        $validFrom = fake()->dateTimeBetween('-1 year', 'now');
+        $validFrom = $this->faker->dateTimeBetween('-1 year', 'now');
         // Validité de 30 jours à partir de la date de début
         $validTo = (clone $validFrom)->modify('+30 days');
 
         return [
-            'wording' => fake()->words(3, true) . ' Licence',
-            'slug' => fake()->unique()->slug(),
-            'description' => fake()->sentence(),
-            'max_apps' => fake()->numberBetween(1, 20),
-            'max_executions_per_24h' => fake()->numberBetween(100, 10000),
+            'wording' => $this->faker->words(3, true) . ' Licence',
+            'slug' => $this->faker->unique()->slug(),
+            'description' => $this->faker->sentence(),
+            'max_apps' => $this->faker->numberBetween(1, 20),
+            'max_executions_per_24h' => $this->faker->numberBetween(100, 10000),
             'valid_from' => $validFrom,
             'valid_to' => $validTo,
-            'status' => fake()->randomElement(['ACTIVE', 'SUSPENDED', 'EXPIRED']),
-            'is_active' => fake()->boolean(80),
+            'status' => $this->faker->randomElement(['ACTIVE', 'SUSPENDED', 'EXPIRED']),
+            'is_active' => $this->faker->boolean(80),
         ];
     }
 

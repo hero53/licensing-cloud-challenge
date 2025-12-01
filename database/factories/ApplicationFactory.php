@@ -18,8 +18,8 @@ class ApplicationFactory extends Factory
     {
         return [
             'user_id' => \App\Models\User::factory(),
-            'wording' => fake()->words(2, true) . ' App',
-            'description' => fake()->sentence(),
+            'wording' => $this->faker->words(2, true) . ' App',
+            'description' => $this->faker->sentence(),
             'is_active' => true,
         ];
     }
