@@ -21,7 +21,7 @@ defineProps<{
 
 <template>
     <AuthBase
-        title="Connectez-vous à votre compte"
+        title="Connectez-vous à votre compte "
         description="Entrez votre email et mot de passe ci-dessous pour vous connecter"
     >
         <Head title="Connexion" />
