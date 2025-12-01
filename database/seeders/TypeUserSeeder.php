@@ -13,17 +13,21 @@ class TypeUserSeeder extends Seeder
     public function run(): void
     {
         // Créer le type Administrateur
-        TypeUser::create([
-            'wording' => 'Administrateur',
-            'slug' => 'admin',
-            'is_active' => true,
-        ]);
+        TypeUser::firstOrCreate(
+            ['slug' => 'admin'],
+            [
+                'wording' => 'Administrateur',
+                'is_active' => true,
+            ]
+        );
 
         // Créer le type Client
-        TypeUser::create([
-            'wording' => 'Client',
-            'slug' => 'client',
-            'is_active' => true,
-        ]);
+        TypeUser::firstOrCreate(
+            ['slug' => 'client'],
+            [
+                'wording' => 'Client',
+                'is_active' => true,
+            ]
+        );
     }
 }
