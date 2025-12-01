@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  # Service MySQL
+  mysql:
+    image: mysql:8.0
+    container_name: licensing_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: licensing
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_USER: licensing_user
+      MYSQL_PASSWORD: licensing_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - licensing_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_password"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Service Application Laravel
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: licensing_app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+      - /var/www/html/node_modules
+      - /var/www/html/vendor
+    ports:
+      - "8000:8000"
+      - "5173:5173"
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - licensing_network
+    command: >
+      sh -c "
+        chmod +x /var/www/html/init.sh &&
+        /var/www/html/init.sh &&
+        php artisan serve --host=0.0.0.0 --port=8000
+      "
+
+  # Service Vite (pour le frontend)
+  vite:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: licensing_vite
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+      - /var/www/html/node_modules
+    ports:
+      - "5174:5173"
+    networks:
+      - licensing_network
+    command: npm run dev -- --host 0.0.0.0
+
+networks:
+  licensing_network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local
