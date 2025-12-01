@@ -147,23 +147,130 @@ docker compose exec app bash
 
 ```
 .
-├── app/                    # Code source Laravel
-│   ├── Core/              # Classes métier principales
-│   ├── Http/              # Controllers et Middleware
-│   └── Models/            # Modèles Eloquent
+├── app/                           # Code source Laravel
+│   ├── Actions/                   # Actions Fortify
+│   │   └── Fortify/
+│   │       ├── CreateNewUser.php              # Création d'utilisateur
+│   │       ├── ResetUserPassword.php          # Réinitialisation mot de passe
+│   │       └── PasswordValidationRules.php    # Règles de validation
+│   │
+│   ├── Console/                   # Commandes Artisan
+│   │   └── Commands/
+│   │       └── GenerateLicenceTokens.php      # Génération tokens de licence
+│   │
+│   ├── Core/                      # Classes métier principales
+│   │   ├── LicenceTokenManager.php            # Gestionnaire de tokens de licence
+│   │   └── SlidingWindow.php                  # Algorithme sliding window
+│   │
+│   ├── Http/
+│   │   ├── Controllers/           # Contrôleurs
+│   │   │   ├── Controller.php                 # Contrôleur de base
+│   │   │   ├── DashboardController.php        # Tableau de bord
+│   │   │   ├── LicenceController.php          # Gestion des licences
+│   │   │   └── Settings/
+│   │   │       ├── PasswordController.php     # Modification mot de passe
+│   │   │       ├── ProfileController.php      # Gestion profil utilisateur
+│   │   │       └── TwoFactorAuthenticationController.php  # 2FA
+│   │   │
+│   │   ├── Middleware/            # Middlewares
+│   │   │   ├── HandleAppearance.php           # Gestion thème sombre/clair
+│   │   │   ├── HandleInertiaRequests.php      # Gestion requêtes Inertia
+│   │   │   └── IsAdmin.php                    # Vérification droits admin
+│   │   │
+│   │   └── Requests/              # Form Requests
+│   │       └── Settings/
+│   │           ├── ProfileUpdateRequest.php   # Validation profil
+│   │           └── TwoFactorAuthenticationRequest.php  # Validation 2FA
+│   │
+│   ├── Models/                    # Modèles Eloquent
+│   │   ├── Application.php                    # Modèle Application
+│   │   ├── JobApplication.php                 # Modèle Job d'application
+│   │   ├── Licence.php                        # Modèle Licence
+│   │   ├── TypeUser.php                       # Modèle Type d'utilisateur
+│   │   ├── User.php                           # Modèle Utilisateur
+│   │   └── UserApplicationJob.php             # Modèle pivot User-App-Job
+│   │
+│   ├── Policies/                  # Policies (autorisations)
+│   │   └── LicencePolicy.php                  # Politique de gestion des licences
+│   │
+│   ├── Providers/                 # Service Providers
+│   │   ├── AppServiceProvider.php             # Provider principal
+│   │   └── FortifyServiceProvider.php         # Configuration Fortify
+│   │
+│   ├── Services/                  # Services métier
+│   │   ├── ApplicationService.php             # Logique métier Applications
+│   │   ├── ExecutionLimitService.php          # Gestion limites d'exécution
+│   │   ├── LicenceService.php                 # Logique métier Licences
+│   │   └── LicenceUpgradeService.php          # Upgrade de licences
+│   │
+│   └── Traits/                    # Traits réutilisables
+│       ├── HasActiveStatus.php                # Gestion statut actif/inactif
+│       ├── HasSlug.php                        # Génération automatique de slugs
+│       └── HasUld.php                         # Génération d'identifiants uniques
+│
 ├── database/
-│   ├── migrations/        # Migrations de base de données
-│   └── seeders/           # Seeders pour les données de test
+│   ├── migrations/                # Migrations de base de données
+│   │   ├── create_type_users_table.php
+│   │   ├── create_licences_table.php
+│   │   ├── create_users_table.php
+│   │   ├── create_applications_table.php
+│   │   └── ...
+│   │
+│   └── seeders/                   # Seeders pour les données de test
+│       ├── DatabaseSeeder.php                 # Seeder principal
+│       ├── TypeUserSeeder.php                 # Types d'utilisateurs
+│       ├── LicenceSeeder.php                  # Licences prédéfinies
+│       ├── UserSeeder.php                     # Utilisateurs de test
+│       └── ApplicationSeeder.php              # Applications de test
+│
 ├── resources/
-│   ├── js/                # Code source Vue.js/TypeScript
-│   │   ├── components/   # Composants Vue réutilisables
-│   │   ├── layouts/      # Layouts de l'application
-│   │   └── pages/        # Pages Inertia.js
-│   └── views/            # Templates Blade
-├── routes/               # Définition des routes
-├── docker-compose.yml    # Configuration Docker Compose
-├── Dockerfile            # Image Docker de l'application
-└── init.sh              # Script d'initialisation automatique
+│   ├── js/                        # Code source Vue.js/TypeScript
+│   │   ├── components/            # Composants Vue réutilisables
+│   │   │   ├── ui/                # Composants UI (shadcn/ui)
+│   │   │   ├── AppearanceTabs.vue
+│   │   │   ├── DeleteUser.vue
+│   │   │   ├── InputError.vue
+│   │   │   └── ...
+│   │   │
+│   │   ├── layouts/               # Layouts de l'application
+│   │   │   ├── AppLayout.vue                  # Layout principal
+│   │   │   ├── AuthLayout.vue                 # Layout authentification
+│   │   │   └── settings/
+│   │   │       └── Layout.vue                 # Layout paramètres
+│   │   │
+│   │   ├── pages/                 # Pages Inertia.js
+│   │   │   ├── auth/              # Pages d'authentification
+│   │   │   │   ├── Login.vue
+│   │   │   │   ├── Register.vue
+│   │   │   │   ├── ForgotPassword.vue
+│   │   │   │   ├── ResetPassword.vue
+│   │   │   │   ├── VerifyEmail.vue
+│   │   │   │   ├── ConfirmPassword.vue
+│   │   │   │   └── TwoFactorChallenge.vue
+│   │   │   │
+│   │   │   ├── settings/          # Pages de paramètres
+│   │   │   │   ├── Profile.vue
+│   │   │   │   ├── Password.vue
+│   │   │   │   ├── TwoFactor.vue
+│   │   │   │   └── Appearance.vue
+│   │   │   │
+│   │   │   ├── Dashboard.vue                  # Tableau de bord
+│   │   │   ├── Licences.vue                   # Gestion des licences
+│   │   │   └── Welcome.vue                    # Page d'accueil
+│   │   │
+│   │   └── types/                 # Types TypeScript
+│   │
+│   └── views/                     # Templates Blade
+│       └── app.blade.php                      # Template principal
+│
+├── routes/
+│   ├── web.php                    # Routes web principales
+│   └── auth.php                   # Routes d'authentification
+│
+├── docker-compose.yml             # Configuration Docker Compose
+├── Dockerfile                     # Image Docker de l'application
+├── init.sh                        # Script d'initialisation automatique
+└── README.md                      # Documentation du projet
 ```
 
 ## Fonctionnalités détaillées
